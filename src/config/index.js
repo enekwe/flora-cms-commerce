@@ -2,6 +2,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Validate critical environment variables in production
+if (process.env.NODE_ENV === 'production') {
+  const requiredVars = [
+    'MONGODB_URI',
+    'ENCRYPTION_KEY',
+    'JWT_SECRET',
+  ];
+
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    console.error('❌ CRITICAL: Missing required environment variables:');
+    missingVars.forEach(varName => {
+      console.error(`   - ${varName}`);
+    });
+    console.error('\nApplication cannot start. Please configure these variables in Railway.');
+    process.exit(1);
+  }
+}
+
 export default {
   server: {
     port: process.env.PORT || 4002,

@@ -42,6 +42,20 @@ export const connectDatabase = async () => {
     });
   } catch (error) {
     logger.error(`Error connecting to MongoDB: ${error.message}`);
+
+    // Provide helpful error message for missing URI
+    if (error.message.includes('Invalid scheme') ||
+        error.message.includes('connection string') ||
+        config.database.mongodb.uri.includes('localhost')) {
+      logger.error('\n❌ CRITICAL DATABASE ERROR:');
+      logger.error('MongoDB connection failed. This is likely because:');
+      logger.error('1. MONGODB_URI environment variable is not set');
+      logger.error('2. The connection string format is invalid');
+      logger.error('\nIn Railway, set MONGODB_URI with:');
+      logger.error('railway variables --set MONGODB_URI="mongodb+srv://user:pass@cluster/db"');
+      logger.error('\nCurrent URI (sanitized):', config.database.mongodb.uri.replace(/\/\/.*@/, '//***:***@'));
+    }
+
     throw error;
   }
 };
