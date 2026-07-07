@@ -6,8 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (using lockfile for deterministic builds)
+RUN npm ci --omit=dev
 
 # Production stage
 FROM node:18-alpine
