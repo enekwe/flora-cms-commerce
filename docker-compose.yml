@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  flora-cms-commerce:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flora-cms-commerce
+    restart: unless-stopped
+    ports:
+      - "4002:4002"
+    environment:
+      - NODE_ENV=production
+      - PORT=4002
+      - MONGODB_URI=${MONGODB_URI}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - WORDPRESS_CLIENT_ID=${WORDPRESS_CLIENT_ID}
+      - WORDPRESS_CLIENT_SECRET=${WORDPRESS_CLIENT_SECRET}
+      - WORDPRESS_REDIRECT_URI=${WORDPRESS_REDIRECT_URI}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - SHOPIFY_REDIRECT_URI=${SHOPIFY_REDIRECT_URI}
+      - SHOPIFY_SCOPES=${SHOPIFY_SCOPES}
+      - COMMAND_CENTER_URL=${COMMAND_CENTER_URL}
+      - GRPC_PORT=${GRPC_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+    networks:
+      - flora-network
+    depends_on:
+      - mongodb
+      - redis
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); });"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mongodb:
+    image: mongo:7
+    container_name: flora-cms-commerce-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password}
+      - MONGO_INITDB_DATABASE=flora-cms-commerce
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - flora-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: flora-cms-commerce-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - flora-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  flora-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local
+  redis-data:
+    driver: local
