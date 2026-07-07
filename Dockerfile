@@ -6,8 +6,15 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (using lockfile for deterministic builds)
-RUN npm ci --omit=dev
+# Install ALL dependencies (including devDependencies for TypeScript compilation)
+RUN npm ci
+
+# Copy TypeScript config and source code
+COPY tsconfig.json ./
+COPY src ./src
+
+# Build TypeScript to JavaScript
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine
@@ -18,11 +25,12 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy node_modules from builder
-COPY --from=builder /app/node_modules ./node_modules
+# Install only production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# Copy application files
-COPY --chown=nodejs:nodejs . .
+# Copy compiled JavaScript from builder (dist directory)
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
 # Switch to non-root user
 USER nodejs
@@ -30,9 +38,9 @@ USER nodejs
 # Expose port
 EXPOSE 4002
 
-# Health check
+# Health check (using ES module syntax)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:4002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); });"
+  CMD node --eval "import('http').then(http => http.get('http://localhost:4002/health', res => process.exit(res.statusCode === 200 ? 0 : 1)));"
 
-# Start application
-CMD ["node", "src/index.js"]
+# Start application from compiled dist directory
+CMD ["node", "dist/index.js"]
