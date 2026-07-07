@@ -32,6 +32,10 @@ RUN npm ci --omit=dev
 # Copy compiled JavaScript from builder (dist directory)
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
+# Pre-create logs directory with proper ownership (fallback for file logging)
+# This ensures file logging works if ENABLE_FILE_LOGGING=true is set
+RUN mkdir -p logs && chown -R nodejs:nodejs logs
+
 # Switch to non-root user
 USER nodejs
 

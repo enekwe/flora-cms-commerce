@@ -31,7 +31,15 @@ const logger = winston.createLogger({
 });
 
 // Add file transport in production
-if (config.server.env === 'production') {
+// Cloud-native platforms (Railway, Vercel, etc.) aggregate logs from stdout/stderr,
+// so file logging is disabled when running in these environments to avoid permission issues.
+// File logging can be explicitly enabled by setting ENABLE_FILE_LOGGING=true
+const isRailway = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_DEPLOYMENT_ID;
+const isVercel = process.env.VERCEL || process.env.VERCEL_ENV;
+const isCloudPlatform = isRailway || isVercel;
+const fileLoggingEnabled = process.env.ENABLE_FILE_LOGGING === 'true';
+
+if (config.server.env === 'production' && !isCloudPlatform && fileLoggingEnabled) {
   logger.add(
     new winston.transports.File({
       filename: 'logs/error.log',
@@ -45,6 +53,12 @@ if (config.server.env === 'production') {
       format: json(),
     })
   );
+  logger.info('File logging enabled: logs will be written to logs/ directory');
+} else if (config.server.env === 'production') {
+  const reason = isCloudPlatform
+    ? 'running on cloud platform (logs aggregated from stdout)'
+    : 'ENABLE_FILE_LOGGING not set to true';
+  logger.info(`File logging disabled: ${reason}`);
 }
 
 export default logger;
