@@ -55,8 +55,8 @@ export default {
     apiBaseUrl: 'https://public-api.wordpress.com',
   },
   shopify: {
-    apiKey: process.env.SHOPIFY_API_KEY,
-    apiSecret: process.env.SHOPIFY_API_SECRET,
+    clientId: process.env.SHOPIFY_CLIENT_ID,
+    clientSecret: process.env.SHOPIFY_CLIENT_SECRET,
     redirectUri: process.env.SHOPIFY_REDIRECT_URI,
     scopes: process.env.SHOPIFY_SCOPES || 'read_products,write_products,read_themes,write_themes,read_content,write_content',
     apiVersion: '2024-01',

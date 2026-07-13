@@ -41,8 +41,8 @@ WORDPRESS_CLIENT_SECRET=your_wordpress_client_secret
 WORDPRESS_REDIRECT_URI=https://your-railway-domain.up.railway.app/api/v1/wordpress/auth/callback
 
 # Shopify Integration
-SHOPIFY_API_KEY=your_shopify_api_key
-SHOPIFY_API_SECRET=your_shopify_api_secret
+SHOPIFY_CLIENT_ID=your_shopify_client_id
+SHOPIFY_CLIENT_SECRET=your_shopify_client_secret
 SHOPIFY_REDIRECT_URI=https://your-railway-domain.up.railway.app/api/v1/shopify/auth/callback
 SHOPIFY_SCOPES=read_products,write_products,read_themes,write_themes,read_content,write_content
 

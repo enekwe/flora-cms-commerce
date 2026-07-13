@@ -47,7 +47,7 @@ class ShopifyAuthService {
       .join('&');
 
     const generatedHash = crypto
-      .createHmac('sha256', config.shopify.apiSecret)
+      .createHmac('sha256', config.shopify.clientSecret)
       .update(message)
       .digest('hex');
 
@@ -67,7 +67,7 @@ class ShopifyAuthService {
     const state = this.generateState(userId, organizationId, normalizedShop);
 
     const authUrl = new URL(`https://${normalizedShop}/admin/oauth/authorize`);
-    authUrl.searchParams.append('client_id', config.shopify.apiKey);
+    authUrl.searchParams.append('client_id', config.shopify.clientId);
     authUrl.searchParams.append('scope', config.shopify.scopes);
     authUrl.searchParams.append('redirect_uri', redirectUri || config.shopify.redirectUri);
     authUrl.searchParams.append('state', state);
@@ -101,8 +101,8 @@ class ShopifyAuthService {
 
       // Exchange code for access token
       const tokenResponse = await axios.post(`https://${shop}/admin/oauth/access_token`, {
-        client_id: config.shopify.apiKey,
-        client_secret: config.shopify.apiSecret,
+        client_id: config.shopify.clientId,
+        client_secret: config.shopify.clientSecret,
         code,
       });
 

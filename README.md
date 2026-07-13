@@ -58,8 +58,8 @@ WORDPRESS_CLIENT_SECRET=your_client_secret
 WORDPRESS_REDIRECT_URI=https://api.flora.passbook.vc/api/v1/cms-commerce/wordpress/callback
 
 # Shopify
-SHOPIFY_API_KEY=your_api_key
-SHOPIFY_API_SECRET=your_api_secret
+SHOPIFY_CLIENT_ID=your_client_id
+SHOPIFY_CLIENT_SECRET=your_client_secret
 SHOPIFY_REDIRECT_URI=https://api.flora.passbook.vc/api/v1/cms-commerce/shopify/callback
 
 # Webflow (Future)

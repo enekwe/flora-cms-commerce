@@ -12,6 +12,7 @@ import logger from './utils/logger.js';
 import wordpressRoutes from './api/rest/routes/wordpress.js';
 import shopifyRoutes from './api/rest/routes/shopify.js';
 import themesRoutes from './api/rest/routes/themes.js';
+import statusRoutes from './api/rest/routes/status.js';
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/wordpress', wordpressRoutes);
 app.use('/api/v1/shopify', shopifyRoutes);
 app.use('/api/v1/themes', themesRoutes);
+app.use('/api/v1/status', statusRoutes);
 
 // GraphQL endpoint (to be implemented)
 // app.use('/graphql', graphqlRouter);
